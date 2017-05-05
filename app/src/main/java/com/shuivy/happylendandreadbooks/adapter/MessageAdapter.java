@@ -12,6 +12,7 @@ import android.widget.TextView;
 
 import com.shuivy.happylendandreadbooks.R;
 import com.shuivy.happylendandreadbooks.models.MyMessage;
+import com.shuivy.happylendandreadbooks.models.MyMessageInfo;
 import com.shuivy.happylendandreadbooks.util.MessageListBuilder;
 
 import java.util.ArrayList;
@@ -23,58 +24,49 @@ import java.util.List;
  */
 public class MessageAdapter extends BaseAdapter {
     private Context mContext;
-    private List<MyMessage> messList = new ArrayList<>();
-    private MessageListBuilder messageListBuilder;
+    private List<MyMessageInfo> messList = new ArrayList<>();
+    private LayoutInflater inflater;
+    //private MessageListBuilder messageListBuilder;
     private static final int COUNT = 10;
 
-    private int[] headImage = new int[]{
-            R.mipmap.share_person_1,
-            R.mipmap.share_person_2,
-            R.mipmap.share_person_3,
-            R.mipmap.share_person_4,
-            R.mipmap.share_person_5,
-            R.mipmap.share_person_6,
-            R.mipmap.share_person_7,
-            R.mipmap.share_person_8,
-            R.mipmap.share_person_9,
-            R.mipmap.share_person_10,
-    };
-    private HashMap<String, Integer> guestProtraits = new HashMap<>();
 
-    private String[] nickName = new String[]{
-            "爱书宝贝",
-            "小小书虫",
-            "读书如此简单",
-            "Hello Kitty",
-            "启动追一个梦",
-            "我是小猫咪",
-            "随风飞舞~",
-            "白马王子",
-            "校园时代",
-            "暗夜小精灵",
-    };
-    private String[] signature = new String[]{
-            "上海大学见面哦，见面聊~",
-            "你的书挺好看的，以后多多交流",
-            "很高兴见到你",
-            "^_^",
-            "你的书能便宜点吗",
-            "呀。",
-            "你好呀，朋友",
-            "hi，你好呀，我们的书换着看怎么样",
-            "书读百遍其义自见",
-            "哈哈",
-    };
+//    private HashMap<String, Integer> guestProtraits = new HashMap<>();
+//
+//    private String[] nickName = new String[]{
+//            "爱书宝贝",
+//            "小小书虫",
+//            "读书如此简单",
+//            "Hello Kitty",
+//            "启动追一个梦",
+//            "我是小猫咪",
+//            "随风飞舞~",
+//            "白马王子",
+//            "校园时代",
+//            "暗夜小精灵",
+//    };
+//    private String[] signature = new String[]{
+//            "上海大学见面哦，见面聊~",
+//            "你的书挺好看的，以后多多交流",
+//            "很高兴见到你",
+//            "^_^",
+//            "你的书能便宜点吗",
+//            "呀。",
+//            "你好呀，朋友",
+//            "hi，你好呀，我们的书换着看怎么样",
+//            "书读百遍其义自见",
+//            "哈哈",
+//    };
 
-    public MessageAdapter(Context mContext) {
+    public MessageAdapter(Context mContext,List<MyMessageInfo> messList) {
         this.mContext = mContext;
-        guestProtraits.put("1", R.mipmap.share_person_1);
-        guestProtraits.put("2", R.mipmap.share_person_2);
-        guestProtraits.put("3", R.mipmap.share_person_3);
-        guestProtraits.put("4", R.mipmap.share_person_4);
-        guestProtraits.put("5", R.mipmap.share_person_5);
-        messageListBuilder = new MessageListBuilder(mContext);
-        messList = messageListBuilder.getMessages();
+//        guestProtraits.put("1", R.mipmap.share_person_1);
+//        guestProtraits.put("2", R.mipmap.share_person_2);
+//        guestProtraits.put("3", R.mipmap.share_person_3);
+//        guestProtraits.put("4", R.mipmap.share_person_4);
+//        guestProtraits.put("5", R.mipmap.share_person_5);
+//        messageListBuilder = new MessageListBuilder(mContext);
+        inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        this.messList = messList;
     }
 
     @Override
@@ -83,7 +75,7 @@ public class MessageAdapter extends BaseAdapter {
     }
 
     @Override
-    public MyMessage getItem(int i) {
+    public MyMessageInfo getItem(int i) {
         return messList.get(i);
     }
 
@@ -97,10 +89,10 @@ public class MessageAdapter extends BaseAdapter {
         Log.d("position", i + "");
 
         ViewHolder holder;
-        MyMessage message = getItem(i);
-        Log.d("stkdebug_adapter", message.getGuestName());
-        Log.d("stkdebug_adapter", message.getContent());
-        Log.d("stkdebug_adapter", message.getDate() + "");
+        MyMessageInfo message = getItem(i);
+//        Log.d("stkdebug_adapter", message.getGuestName());
+//        Log.d("stkdebug_adapter", message.getContent());
+        //Log.d("stkdebug_adapter", message.getDate() + "");
         if (convertView == null) {
             holder = new ViewHolder();
             convertView = LayoutInflater.from(mContext).inflate(R.layout.message_item, null);
@@ -111,8 +103,8 @@ public class MessageAdapter extends BaseAdapter {
         } else {
             holder = (ViewHolder) convertView.getTag();
         }
-        holder.imageView.setImageResource(this.guestProtraits.get(message.getGuestCode()));
-        holder.nickNameTextView.setText(message.getGuestName());
+        holder.imageView.setImageResource(R.mipmap.share_person_1);
+        holder.nickNameTextView.setText(message.getGuestToName());
         holder.latestChatTextView.setText(message.getContent());
         return convertView;
     }

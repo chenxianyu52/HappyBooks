@@ -168,7 +168,7 @@ public class MyDataBaseHelper extends SQLiteOpenHelper {
             result = new BookInfo();
             result.setTitle(c.getString(1));
             byte[] blob = c.getBlob(2);
-            result.setImg(BitmapFactory.decodeByteArray(blob, 0, blob.length));
+            //result.setImg(BitmapFactory.decodeByteArray(blob, 0, blob.length));
             result.setDes(c.getString(3));
             result.setLocation(c.getString(4));
             result.setCreateDate(c.getLong(5));
@@ -191,7 +191,7 @@ public class MyDataBaseHelper extends SQLiteOpenHelper {
             result = new BookInfo();
             result.setTitle(c.getString(1));
             byte[] blob = c.getBlob(2);
-            result.setImg(BitmapFactory.decodeByteArray(blob, 0, blob.length));
+            //result.setImg(BitmapFactory.decodeByteArray(blob, 0, blob.length));
             result.setDes(c.getString(3));
             result.setLocation(c.getString(4));
             result.setCreateDate(c.getLong(5));
@@ -212,7 +212,7 @@ public class MyDataBaseHelper extends SQLiteOpenHelper {
         if(c.moveToNext()){
             bookInfo.setTitle(c.getString(1));
             byte[] blob = c.getBlob(2);
-            bookInfo.setImg(BitmapFactory.decodeByteArray(blob, 0, blob.length));
+           // bookInfo.setImg(BitmapFactory.decodeByteArray(blob, 0, blob.length));
             bookInfo.setDes(c.getString(3));
             bookInfo.setLocation(c.getString(4));
             bookInfo.setCreateDate(c.getLong(5));
@@ -227,7 +227,7 @@ public class MyDataBaseHelper extends SQLiteOpenHelper {
     public void storeUrineTestData(BookInfo data) {
         ContentValues cv = new ContentValues();
         cv.put("title", data.getTitle());
-        cv.put("img", Bitmap2Bytes(data.getImg()));
+       // cv.put("img", Bitmap2Bytes(data.getImg()));
         cv.put("des", data.getDes());
         cv.put("location", data.getLocation());
         cv.put("create_date",data.getCreateDate());

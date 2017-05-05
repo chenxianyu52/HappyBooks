@@ -5,7 +5,9 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.provider.MediaStore;
+import android.util.Base64;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
@@ -31,12 +33,25 @@ import com.baidu.mapapi.model.LatLng;
 import com.shuivy.happylendandreadbooks.R;
 import com.shuivy.happylendandreadbooks.database.MyDataBaseHelper;
 import com.shuivy.happylendandreadbooks.models.BookInfo;
+import com.shuivy.happylendandreadbooks.models.MyUser;
 import com.shuivy.happylendandreadbooks.util.ToastUtil;
 
 import org.w3c.dom.Text;
 
+import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.net.URI;
 import java.util.Date;
+
+import cn.bmob.v3.BmobUser;
+import cn.bmob.v3.datatype.BmobFile;
+import cn.bmob.v3.exception.BmobException;
+import cn.bmob.v3.listener.SaveListener;
+import cn.bmob.v3.listener.UploadFileListener;
 
 /**
  * Created by sqhan on 2016/7/27.
@@ -169,7 +184,13 @@ public class PublishActivity extends Activity {
     private void storeToDb() {
 
         seletedType = (RadioButton)findViewById(publishType.getCheckedRadioButtonId());
+        MyUser userinfo = BmobUser.getCurrentUser(MyUser.class);
+        String userId = userinfo.getObjectId();
+        String username = userinfo.getUsername();
+
         BookInfo bookInfo = new BookInfo();
+        bookInfo.setUserId(userId);
+        bookInfo.setUsername(username);
         bookInfo.setTitle(title.getText().toString());
         bookInfo.setDes(des.getText().toString());
         bookInfo.setCreateDate(new Date().getTime());
@@ -183,16 +204,61 @@ public class PublishActivity extends Activity {
         bookInfo.setBookClass(typeNameString);
         imageView.setDrawingCacheEnabled(true);
         if (imageView.getDrawable() != null) {
-            bookInfo.setImg(Bitmap.createBitmap(imageView.getDrawingCache()));
+            Bitmap mp = Bitmap.createBitmap(imageView.getDrawingCache());
+            bookInfo.setImg(bitmapToBase64(mp));
+
+//
         }
-        imageView.setDrawingCacheEnabled(false);
+
+//        imageView.setDrawingCacheEnabled(false);
         bookInfo.setLocation(location.getText().toString());
-        MyDataBaseHelper.getInstance(this).storeUrineTestData(bookInfo);
+        bookInfo.save(new SaveListener<String>() {
+            @Override
+            public void done(String s, BmobException e) {
+                if(e==null){
+                    Toast.makeText(PublishActivity.this,"添加数据成功",Toast.LENGTH_LONG).show();
+                }else{
+                    Toast.makeText(PublishActivity.this,"创建数据失败：" + e.getMessage(),Toast.LENGTH_LONG).show();
+                }
+            }
+        });
+        //MyDataBaseHelper.getInstance(this).storeUrineTestData(bookInfo);
     }
 
     private void initIndex() {
         initView();
     }
+    public static String bitmapToBase64(Bitmap bitmap) {
+
+        String result = null;
+        ByteArrayOutputStream baos = null;
+        try {
+            if (bitmap != null) {
+                baos = new ByteArrayOutputStream();
+                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+
+                baos.flush();
+                baos.close();
+
+                byte[] bitmapBytes = baos.toByteArray();
+                result = Base64.encodeToString(bitmapBytes, Base64.DEFAULT);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (baos != null) {
+                    baos.flush();
+                    baos.close();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return result;
+    }
+
+
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {

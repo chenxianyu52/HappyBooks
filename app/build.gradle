@@ -30,11 +30,12 @@ dependencies {
     debugCompile 'com.antfortune.freeline:runtime:0.6.2'
     releaseCompile 'com.antfortune.freeline:runtime-no-op:0.6.2'
     testCompile 'com.antfortune.freeline:runtime-no-op:0.6.2'
-    compile files('D:/Android Projects/HappyBooks/libs/baidumapapi_base_v4_0_0.jar')
-    compile files('D:/Android Projects/HappyBooks/libs/baidumapapi_cloud_v4_0_0.jar')
-    compile files('D:/Android Projects/HappyBooks/libs/baidumapapi_map_v4_0_0.jar')
-    compile files('D:/Android Projects/HappyBooks/libs/baidumapapi_radar_v4_0_0.jar')
-    compile files('D:/Android Projects/HappyBooks/libs/baidumapapi_search_v4_0_0.jar')
-    compile files('D:/Android Projects/HappyBooks/libs/baidumapapi_util_v4_0_0.jar')
-    compile files('D:/Android Projects/HappyBooks/libs/locSDK_6.13.jar')
+    compile 'cn.bmob.android:bmob-sdk:3.5.0'
+    compile files('E:/AndroidStudioProjects/HappyBooks/libs/baidumapapi_base_v4_0_0.jar')
+    compile files('E:/AndroidStudioProjects/HappyBooks/libs/baidumapapi_cloud_v4_0_0.jar')
+    compile files('E:/AndroidStudioProjects/HappyBooks/libs/baidumapapi_map_v4_0_0.jar')
+    compile files('E:/AndroidStudioProjects/HappyBooks/libs/baidumapapi_radar_v4_0_0.jar')
+    compile files('E:/AndroidStudioProjects/HappyBooks/libs/baidumapapi_search_v4_0_0.jar')
+    compile files('E:/AndroidStudioProjects/HappyBooks/libs/baidumapapi_util_v4_0_0.jar')
+    compile files('E:/AndroidStudioProjects/HappyBooks/libs/locSDK_6.13.jar')
 }

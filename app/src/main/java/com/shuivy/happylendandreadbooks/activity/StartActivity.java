@@ -26,7 +26,7 @@ public class StartActivity extends Activity {
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                Intent intent = new Intent(StartActivity.this, BookMainActivity.class);
+                Intent intent = new Intent(StartActivity.this, LoginActivity.class);
                 startActivity(intent);
                 StartActivity.this.finish();
             }

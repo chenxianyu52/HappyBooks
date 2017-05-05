@@ -5,33 +5,36 @@ import android.database.sqlite.SQLiteDatabase;
 
 import com.shuivy.happylendandreadbooks.database.MyDataBaseHelper;
 
+import cn.bmob.v3.BmobObject;
+
 /**
  * Created by stk on 2016/8/7 0007.
  */
-public class MyMessage {
-    private Integer id;
-    //1 代表别人发给我的 0代表我发给别人的
-    private Integer type;
+public class MyMessage extends BmobObject{
+
     private String guestName;
     private String guestCode;
+    private String guestToName;
+    private String guestToCode;
     private String content;
-    private Long date;
 
-    public Integer getId() {
-        return id;
+    public String getGuestToName() {
+        return guestToName;
     }
 
-    public void setId(Integer id) {
-        this.id = id;
+    public void setGuestToName(String guestToName) {
+        this.guestToName = guestToName;
     }
 
-    public Integer getType() {
-        return type;
+    public String getGuestToCode() {
+        return guestToCode;
     }
 
-    public void setType(Integer type) {
-        this.type = type;
+    public void setGuestToCode(String guestToCode) {
+        this.guestToCode = guestToCode;
     }
+
+
 
     public String getGuestName() {
         return guestName;
@@ -57,22 +60,15 @@ public class MyMessage {
         this.content = content;
     }
 
-    public Long getDate() {
-        return date;
-    }
 
-    public void setDate(Long date) {
-        this.date = date;
-    }
-
-    public Boolean save(Context context) {
-        MyDataBaseHelper myDataBaseHelper = new MyDataBaseHelper(context);
-        SQLiteDatabase db = myDataBaseHelper.getWritableDatabase();
-        db.execSQL("INSERT INTO message " +
-                "(guest_name,guest_code,type,content,date)" +
-                "VALUES(" +
-                "'" + this.getGuestName() + "','" + this.getGuestCode() + "','" +
-                this.getType() + "','" + this.getContent() + "','" + this.date + "')");
-        return true;
-    }
+//    public Boolean save(Context context) {
+//        MyDataBaseHelper myDataBaseHelper = new MyDataBaseHelper(context);
+//        SQLiteDatabase db = myDataBaseHelper.getWritableDatabase();
+//        db.execSQL("INSERT INTO message " +
+//                "(guest_name,guest_code,type,content,date)" +
+//                "VALUES(" +
+//                "'" + this.getGuestName() + "','" + this.getGuestCode() + "','" +
+//                this.getType() + "','" + this.getContent() + "','" + this.date + "')");
+//        return true;
+//    }
 }

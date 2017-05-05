@@ -1,37 +1,42 @@
 package com.shuivy.happylendandreadbooks.activity;
 
-import android.app.Fragment;
-import android.app.FragmentManager;
-import android.app.FragmentTransaction;
+
+import android.app.ProgressDialog;
+import android.support.v4.app.Fragment;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.KeyEvent;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 
 import com.shuivy.happylendandreadbooks.R;
+import com.shuivy.happylendandreadbooks.component.CustomViewPager;
 import com.shuivy.happylendandreadbooks.fragment.HomeFragment;
 import com.shuivy.happylendandreadbooks.fragment.MarketFragment;
 import com.shuivy.happylendandreadbooks.fragment.MessageFragment;
 import com.shuivy.happylendandreadbooks.fragment.UserFragment;
 import com.shuivy.happylendandreadbooks.util.ToastUtil;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created by Hanshenquan on 2016/7/2.
  */
 public class BookMainActivity extends AppCompatActivity implements View.OnClickListener {
+    private ProgressDialog dialog;
     private static long EXIT_TIME = 0;
     private Context mContext;
-    private Fragment homeFragment;
-    private Fragment findFragment;
-    private Fragment messageFragment;
-    private Fragment userFragment;
+
 
     //定义FragmentManager对象
-    FragmentManager fragmentManager;
+    //FragmentManager fragmentManager;
 
     private RelativeLayout home_item;
     private RelativeLayout find_item;
@@ -43,14 +48,30 @@ public class BookMainActivity extends AppCompatActivity implements View.OnClickL
     private ImageView message_image;
     private ImageView user_image;
     private ImageView publish_image;
+    private CustomViewPager mViewPager;
+    private List<Fragment> mFragment;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.book_main);
-        fragmentManager = getFragmentManager();
+
+        //fragmentManager = getFragmentManager();
+        initData();
         initView();//初始化界面
+
+    }
+
+    private void initData() {
+
+
+            mFragment =new ArrayList<>();
+            mFragment.add(new HomeFragment());
+            mFragment.add(new MarketFragment());
+            mFragment.add(new MessageFragment());
+            mFragment.add(new UserFragment());
+
 
     }
 
@@ -78,77 +99,129 @@ public class BookMainActivity extends AppCompatActivity implements View.OnClickL
         message_item.setOnClickListener(this);
         user_item.setOnClickListener(this);
         publish_image.setOnClickListener(this);
+        mViewPager = (CustomViewPager) findViewById(R.id.mViewPager);
+        //预加载
+        mViewPager.setOffscreenPageLimit(mFragment.size());
+
+        //设置适配器
+        mViewPager.setAdapter(new FragmentPagerAdapter(getSupportFragmentManager()) {
+            //选中的item
+            @Override
+            public Fragment getItem(int position) {
+                if(position==2){
+                    this.notifyDataSetChanged();
+                }
+                return mFragment.get(position);
+            }
+            //返回item的个数
+            @Override
+            public int getCount() {
+                return mFragment.size();
+            }
+
+
+        });
+        mViewPager.setPagingEnabled(false);
+        mViewPager.setCurrentItem(0);
         //默认去进入时显示第一个页面
-        selectItem(0);
+//        selectItem(0);
 
 
 
     }
+
 
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.home_item:
-                selectItem(0);
+                home_image.setImageResource(R.mipmap.comui_tab_home_selected2);
+                find_image.setImageResource(R.mipmap.comui_tab_find);
+                message_image.setImageResource(R.mipmap.comui_tab_message);
+                user_image.setImageResource(R.mipmap.comui_tab_person);
+                mViewPager.setCurrentItem(0);
                 break;
             case R.id.find_item:
-                selectItem(1);
+
+                find_image.setImageResource(R.mipmap.comui_tab_find_selected2);
+                home_image.setImageResource(R.mipmap.comui_tab_home);
+                message_image.setImageResource(R.mipmap.comui_tab_message);
+                user_image.setImageResource(R.mipmap.comui_tab_person);
+                mViewPager.setCurrentItem(1);
+
+                //selectItem(1);
                 break;
             case R.id.message_item:
-                selectItem(2);
+                message_image.setImageResource(R.mipmap.comui_tab_message_selected2);
+                home_image.setImageResource(R.mipmap.comui_tab_home);
+                find_image.setImageResource(R.mipmap.comui_tab_find);
+                user_image.setImageResource(R.mipmap.comui_tab_person);
+                mViewPager.setCurrentItem(2);
+
+
+
+                //selectItem(2);
                 break;
             case R.id.user_item:
-                selectItem(3);
+                user_image.setImageResource(R.mipmap.comui_tab_person_selected2);
+                home_image.setImageResource(R.mipmap.comui_tab_home);
+                find_image.setImageResource(R.mipmap.comui_tab_find);
+                message_image.setImageResource(R.mipmap.comui_tab_message);
+                mViewPager.setCurrentItem(3);
+                //selectItem(3);
                 break;
             case R.id.publish_image:
-                selectItem(4);
+                Intent intent = new Intent(BookMainActivity.this, PublishActivity.class);
+                    startActivity(intent);
+                    //BookMainActivity.this.finish();
+                //selectItem(4);
                 break;
         }
     }
 
-    public void selectItem(int index) {
-        try {
-            FragmentTransaction transaction = fragmentManager.beginTransaction();
-            unselectOthers();
-            switch (index) {
-                case 0:
-                    home_image.setImageResource(R.mipmap.comui_tab_home_selected2);
-                    homeFragment = new HomeFragment();
-                    transaction.replace(R.id.main_container, homeFragment);
-                    break;
-                case 1:
-                    find_image.setImageResource(R.mipmap.comui_tab_find_selected2);
-                    findFragment = new MarketFragment();
-                    transaction.replace(R.id.main_container, findFragment);
-                    break;
-                case 2:
-                    message_image.setImageResource(R.mipmap.comui_tab_message_selected2);
-                    messageFragment = new MessageFragment();
-                    transaction.replace(R.id.main_container, messageFragment);
-                    break;
-                case 3:
-                    user_image.setImageResource(R.mipmap.comui_tab_person_selected2);
-                    userFragment = new UserFragment();
-                    transaction.replace(R.id.main_container, userFragment);
-                    break;
-                case 4:
-                    Intent intent = new Intent(BookMainActivity.this, PublishActivity.class);
-                    startActivity(intent);
-                    //BookMainActivity.this.finish();
-                    break;
-            }
-            transaction.commit();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
+//    public void selectItem(int index) {
+//        try {
+//            FragmentTransaction transaction = fragmentManager.beginTransaction();
+////            unselectOthers();
+//            switch (index) {
+//                case 0:
+//                    home_image.setImageResource(R.mipmap.comui_tab_home_selected2);
+//                    homeFragment = new HomeFragment();
+//                    transaction.replace(R.id.main_container, homeFragment);
+//                    break;
+//                case 1:
+//                    find_image.setImageResource(R.mipmap.comui_tab_find_selected2);
+//                    findFragment = new MarketFragment();
+//                    transaction.replace(R.id.main_container, findFragment);
+//                    break;
+//                case 2:
+//                    message_image.setImageResource(R.mipmap.comui_tab_message_selected2);
+//                    messageFragment = new MessageFragment();
+//                    transaction.replace(R.id.main_container, messageFragment);
+//                    break;
+//                case 3:
+//                    user_image.setImageResource(R.mipmap.comui_tab_person_selected2);
+//                    userFragment = new UserFragment();
+//                    transaction.replace(R.id.main_container, userFragment);
+//                    break;
+//                case 4:
+//                    Intent intent = new Intent(BookMainActivity.this, PublishActivity.class);
+//                    startActivity(intent);
+//                    //BookMainActivity.this.finish();
+//                    break;
+//            }
+//            transaction.commit();
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//    }
 
-    public void unselectOthers() {
-        home_image.setImageResource(R.mipmap.comui_tab_home);
-        find_image.setImageResource(R.mipmap.comui_tab_find);
-        message_image.setImageResource(R.mipmap.comui_tab_message);
-        user_image.setImageResource(R.mipmap.comui_tab_person);
-    }
+//    public void unselectOthers() {
+//        home_image.setImageResource(R.mipmap.comui_tab_home);
+//        find_image.setImageResource(R.mipmap.comui_tab_find);
+//        message_image.setImageResource(R.mipmap.comui_tab_message);
+//        user_image.setImageResource(R.mipmap.comui_tab_person);
+//    }
 
     /**
      * 点击退出按钮

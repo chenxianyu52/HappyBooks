@@ -8,25 +8,31 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.TextView;
 
 import com.shuivy.happylendandreadbooks.R;
 import com.shuivy.happylendandreadbooks.activity.LoginActivity;
 import com.shuivy.happylendandreadbooks.component.StkMenuLayout;
+import com.shuivy.happylendandreadbooks.models.MyUser;
 import com.shuivy.happylendandreadbooks.util.ToastUtil;
 import com.shuivy.happylendandreadbooks.viewmodel.ListMenu;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import cn.bmob.v3.BmobUser;
+
 /**
  * Created by stk on 2016/7/22 0022.
  */
-public class UserFragment extends Fragment implements View.OnClickListener {
+public class UserFragment extends android.support.v4.app.Fragment implements View.OnClickListener {
 
     private Button logOutButton;
     private List<ListMenu> listMenus = new ArrayList<ListMenu>();
     private View mRootView;
     private Activity mContext;
+    private TextView user_username;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -45,6 +51,10 @@ public class UserFragment extends Fragment implements View.OnClickListener {
     }
 
     private void initView() {
+        MyUser userinfo = BmobUser.getCurrentUser(MyUser.class);
+
+        user_username = (TextView) mRootView.findViewById(R.id.user_username);
+        user_username.setText(userinfo.getUsername());
         logOutButton = (Button) mRootView.findViewById(R.id.to_login_button);
         logOutButton.setOnClickListener(this);
         StkMenuLayout jifen = (StkMenuLayout) mRootView.findViewById(R.id.jifen);

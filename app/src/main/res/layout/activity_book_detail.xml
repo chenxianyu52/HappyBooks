@@ -48,7 +48,7 @@
                     android:src="@mipmap/user_default" />
 
                 <TextView
-                    android:id="@+id/textView"
+                    android:id="@+id/detail_username"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
@@ -56,7 +56,7 @@
                     android:layout_marginStart="23dp"
                     android:layout_toEndOf="@+id/detail_photo"
                     android:layout_toRightOf="@+id/detail_photo"
-                    android:text="书虫妞妞~"
+                    android:text=""
                     android:layout_weight="1"/>
                 <TextView
                     android:id="@+id/detail_time"
@@ -64,7 +64,7 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
                     android:layout_marginRight="10dp"
-                    android:text="5天前发布"
+                    android:text=""
                     />
             </LinearLayout>
 
@@ -73,7 +73,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="350dp"
                 android:scaleType="fitXY"
-                android:src="@mipmap/book_detail_1"
+
                 android:layout_marginTop="20dp"/>
 
 
@@ -109,15 +109,16 @@
 
 
     <Button
-            android:id="@+id/detail_submit"
-            android:layout_width="100dp"
-            android:layout_height="50dp"
-            android:background="@drawable/publish_btn_selected"
-            android:text="我想要"
-            android:textColor="@android:color/black"
+        android:id="@+id/detail_submit"
+        android:layout_width="80dp"
+        android:layout_height="40dp"
+        android:background="@drawable/publish_btn_selected"
+        android:text="我想要"
+        android:textColor="@android:color/black"
         android:layout_alignTop="@+id/linearLayout"
         android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true" />
+        android:layout_alignParentEnd="true"
+        android:layout_marginTop="10dp"/>
 
     <LinearLayout
         android:orientation="vertical"
@@ -139,6 +140,7 @@
             android:layout_marginLeft="10dp"/>
 
         <TextView
+
             android:text="聊天"
             android:layout_gravity="left"
             android:layout_width="wrap_content"

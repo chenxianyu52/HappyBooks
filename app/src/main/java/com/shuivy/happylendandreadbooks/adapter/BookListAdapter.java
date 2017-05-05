@@ -11,24 +11,28 @@ import android.widget.Toast;
 
 import com.shuivy.happylendandreadbooks.R;
 import com.shuivy.happylendandreadbooks.models.BookInfo;
+import com.shuivy.happylendandreadbooks.models.BookInfoList;
 import com.shuivy.happylendandreadbooks.util.ToastUtil;
 
 import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created by 江 on 2016/9/27.
  * modify by zhoujichao 2016/10/11
  */
 public class BookListAdapter extends BaseAdapter {
-    private final LayoutInflater inflater;
-    private ArrayList<BookInfo> mData;
+    private LayoutInflater inflater;
+    private List<BookInfoList> mData;
+    private Context mContext;
 
-    public BookListAdapter(Context context, ArrayList<BookInfo> data) {
-        inflater = LayoutInflater.from(context);
-        mData = data;
+    public BookListAdapter(Context context, List<BookInfoList> data) {
+        this.mContext =context;
+        inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        this.mData = data;
     }
 
     @Override
@@ -50,7 +54,7 @@ public class BookListAdapter extends BaseAdapter {
     public View getView(int position, View convertView, ViewGroup parent) {
         ViewHolder holder;
         if (convertView == null) {
-            convertView = inflater.inflate(R.layout.item_home_push, parent, false);
+            convertView = inflater.inflate(R.layout.item_home_push,null);
             holder = new ViewHolder(convertView);
             convertView.setTag(holder);
         } else {
@@ -59,7 +63,7 @@ public class BookListAdapter extends BaseAdapter {
         //计算距离发布的时间
         String dateStr = null;
         long curDate = new Date().getTime();
-        long createDate = mData.get(position).getCreateDate();
+        long createDate = mData.get(position).getTime();
         int secs = (int)(curDate-createDate)/1000;
         int mins = secs/60;
         int hours = mins/60;

@@ -36,9 +36,9 @@ public class ChatListBuilder {
                 MyMessage message = new MyMessage();
                 message.setGuestCode(cursor.getString(cursor.getColumnIndex("guest_code")));
                 message.setGuestName(cursor.getString(cursor.getColumnIndex("guest_name")));
-                message.setType(cursor.getInt(cursor.getColumnIndex("type")));
+                //message.setType(cursor.getInt(cursor.getColumnIndex("type")));
                 message.setContent(cursor.getString(cursor.getColumnIndex("content")));
-                message.setDate(cursor.getLong(cursor.getColumnIndex("date")));
+                //message.setDate(cursor.getLong(cursor.getColumnIndex("date")));
                 this.messList.add(message);
             } while (cursor.moveToNext());
             cursor.close();

@@ -7,13 +7,18 @@ import java.io.ByteArrayOutputStream;
 import java.io.Serializable;
 import java.util.Date;
 
+import cn.bmob.v3.BmobObject;
+import cn.bmob.v3.datatype.BmobFile;
+
 /**
  * Created by 江 on 2016/9/27.
  * modify by zhoujichao on 2016/10/11
  */
-public class BookInfo implements Serializable {
+public class BookInfo extends BmobObject {
     private String title;
-    private Bitmap img;
+    private String userId;
+    private String username;
+    private String img;
     private String des;
     private String location;
     private String publishType;
@@ -21,6 +26,14 @@ public class BookInfo implements Serializable {
     private long createDate;
     private double latitude; //发布用户纬度
     private double longitude;//发布用户经度
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
 
     public double getLatitude() {
         return latitude;
@@ -70,11 +83,11 @@ public class BookInfo implements Serializable {
         this.title = title;
     }
 
-    public Bitmap getImg() {
+    public String getImg() {
         return img;
     }
 
-    public void setImg(Bitmap img) {
+    public void setImg(String img) {
         this.img = img;
     }
 
@@ -95,4 +108,11 @@ public class BookInfo implements Serializable {
     }
 
 
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
 }

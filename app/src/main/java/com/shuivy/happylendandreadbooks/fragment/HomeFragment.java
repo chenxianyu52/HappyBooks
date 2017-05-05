@@ -2,10 +2,15 @@ package com.shuivy.happylendandreadbooks.fragment;
 
 import android.app.Activity;
 import android.app.Fragment;
+import android.app.ProgressDialog;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.view.ViewPager;
+import android.util.Base64;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -13,11 +18,14 @@ import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.ScaleAnimation;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.shuivy.happylendandreadbooks.R;
 import com.shuivy.happylendandreadbooks.activity.BookDetailActivity;
@@ -27,7 +35,9 @@ import com.shuivy.happylendandreadbooks.adapter.BookListAdapter;
 import com.shuivy.happylendandreadbooks.adapter.MyViewPagerAdapter;
 import com.shuivy.happylendandreadbooks.database.MyDataBaseHelper;
 import com.shuivy.happylendandreadbooks.models.BookInfo;
+import com.shuivy.happylendandreadbooks.models.BookInfoList;
 import com.shuivy.happylendandreadbooks.models.BookInfoS;
+import com.shuivy.happylendandreadbooks.util.BitmapToBase64;
 import com.shuivy.happylendandreadbooks.util.ListUtility;
 import com.shuivy.happylendandreadbooks.util.ToastUtil;
 
@@ -35,10 +45,14 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import cn.bmob.v3.BmobQuery;
+import cn.bmob.v3.exception.BmobException;
+import cn.bmob.v3.listener.FindListener;
+
 /**
  * Created by stk on 2016/7/22 0022.
  */
-public class HomeFragment extends Fragment {
+public class HomeFragment extends android.support.v4.app.Fragment {
 
     private View mRootView;
     private Activity mContext;
@@ -51,17 +65,26 @@ public class HomeFragment extends Fragment {
     private int mCount = 3;
     private Handler mHandler = new Handler();
     private int itemPosition;
-    private ArrayList<BookInfo> allBooks;
+    private List<BookInfoList> allBooks = new ArrayList<>();
+    //private ArrayList<BookInfo> allBooks;
     private BookListAdapter bookListAdapter;
     private ScrollView sv;
     private ImageView search;
     private static final int DETAILREQUEST = 1;
+    private ListView listView;
+    private ProgressDialog dialog;
+    private TextView gengduo;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         mContext = getActivity();
+        dialog = new ProgressDialog(mContext);
+        dialog.setTitle("加载中");
+        dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);// 设置进度条的形式为圆形转动的进度条
+        dialog.setCancelable(true);// 设置是否可以通过点击Back键取消
+        dialog.setCanceledOnTouchOutside(false);// 设置在点击Dialog外是否取消Dialog进度条
         if (mRootView == null) {
-            mRootView = inflater.inflate(R.layout.fragment_home, container, false);
+            mRootView = inflater.inflate(R.layout.fragment_home, null);
             mLayoutInflater = inflater;
             initView();
         } else {
@@ -74,15 +97,16 @@ public class HomeFragment extends Fragment {
         return mRootView;
     }
 
-    @Override
-    public void onStart() {
-        super.onStart();
-        allBooks = MyDataBaseHelper.getInstance(getActivity()).getAllBooks();
-        bookListAdapter.notifyDataSetChanged();
-//        sv.smoothScrollTo(0,0);
-    }
+//    @Override
+//    public void onStart() {
+//        super.onStart();
+//        //allBooks = MyDataBaseHelper.getInstance(getActivity()).getAllBooks();
+//        bookListAdapter.notifyDataSetChanged();
+////        sv.smoothScrollTo(0,0);
+//    }
 
     private void initView() {
+        dialog.show();
         mImageIdArray = new int[]{
                 R.mipmap.book_viewpager1,
                 R.mipmap.book_viewpager2,
@@ -90,25 +114,69 @@ public class HomeFragment extends Fragment {
         };
         initIndex();
         search = (ImageView)mRootView.findViewById(R.id.main_search_input);
+        gengduo = (TextView) mRootView.findViewById(R.id.gengduo);
         sv = (ScrollView) mRootView.findViewById(R.id.home_sv);
-        ListView listView = (ListView) mRootView.findViewById(R.id.list_publish_book);
-        allBooks = MyDataBaseHelper.getInstance(getActivity()).getAllBooks();
-        bookListAdapter = new BookListAdapter(getActivity(), allBooks);
-        listView.setAdapter(bookListAdapter);
+        listView = (ListView) mRootView.findViewById(R.id.list_publish_book);
+        //allBooks = MyDataBaseHelper.getInstance(getActivity()).getAllBooks();
+//        bookListAdapter = new BookListAdapter(getActivity(), allBooks);
+//        listView.setAdapter(bookListAdapter);
+        BmobQuery<BookInfo> query= new BmobQuery<BookInfo>();
+        query.findObjects(new FindListener<BookInfo>() {
+            @Override
+            public void done(List<BookInfo> list, BmobException e) {
+                if(e==null){
+
+                    for(int i=0;i<list.size();i++){
+                        BookInfo book = list.get(i);
+                        BookInfoList booklist= new BookInfoList();
+                        booklist.setTitle(book.getTitle());
+                        booklist.setTime(book.getCreateDate());
+                        booklist.setLocation(book.getLocation());
+                        booklist.setPublishType(book.getPublishType());
+                        booklist.setImg(new BitmapToBase64().base64ToBitmap(book.getImg()));
+                        booklist.setObjectId(book.getObjectId());
+                        allBooks.add(booklist);
+
+                    }
+                    //Toast.makeText(getActivity(),list.get(1).getTitle(),Toast.LENGTH_SHORT).show();
+
+                    bookListAdapter =  new BookListAdapter(getActivity(),allBooks);
+                    listView.setAdapter(bookListAdapter);
+
+                    dialog.dismiss();
+                }else{
+                    Log.i("bmob","失败:"+e.getMessage()+","+e.getErrorCode());
+                }
+            }
+        });
         ListUtility.setListViewHeightBasedOnChildren(listView);
         search.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(getActivity(), BookSearchActivity.class);
+                intent.putExtra("flag",0);
                 getActivity().startActivity(intent);
             }
         });
 
+        gengduo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getActivity(),BookSearchActivity.class);
+                intent.putExtra("flag",1);
+                getActivity().startActivity(intent);
+
+            }
+        });
+
+
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                BookInfo book = allBooks.get(i);
+                BookInfoList book = allBooks.get(i);
                 Intent intent = new Intent();
+                intent.putExtra("objectId",book.getObjectId());
+
               /*  BookInfoS book = new BookInfoS();
                 book.setTitle(temp.getTitle());
                 book.setDes(temp.getDes());
@@ -120,12 +188,13 @@ public class HomeFragment extends Fragment {
                 Bundle bundle = new Bundle();
                 bundle.putSerializable("book",book);*/
                 intent.setClass(getActivity(),BookDetailActivity.class);
-                intent.putExtra("title",book.getTitle());
+                //intent.putExtra("title",book.getTitle());
                 startActivityForResult(intent,DETAILREQUEST);
 
             }
         });
     }
+
 
     private void initIndex() {
         viewPager();//首页viewpager

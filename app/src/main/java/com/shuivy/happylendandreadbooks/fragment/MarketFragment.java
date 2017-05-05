@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -35,19 +36,26 @@ import com.baidu.mapapi.model.LatLng;
 import com.baidu.mapapi.model.inner.Point;
 import com.shuivy.happylendandreadbooks.R;
 import com.shuivy.happylendandreadbooks.activity.BookDetailActivity;
+import com.shuivy.happylendandreadbooks.adapter.BookListAdapter;
 import com.shuivy.happylendandreadbooks.database.MyDataBaseHelper;
 import com.shuivy.happylendandreadbooks.models.BookInfo;
+import com.shuivy.happylendandreadbooks.models.BookInfoList;
 import com.shuivy.happylendandreadbooks.models.BookInfoS;
+import com.shuivy.happylendandreadbooks.util.BitmapToBase64;
 import com.shuivy.happylendandreadbooks.util.ToastUtil;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import cn.bmob.v3.BmobQuery;
+import cn.bmob.v3.exception.BmobException;
+import cn.bmob.v3.listener.FindListener;
+
 
 /**
  * Created by stk on 2016/7/22 0022.
  */
-public class MarketFragment extends Fragment {
+public class MarketFragment extends android.support.v4.app.Fragment {
 
     private View mRootView;
     private ListView listView1;
@@ -58,7 +66,7 @@ public class MarketFragment extends Fragment {
     LocationClient mLocClient;
     public MyLocationListener myListener = new MyLocationListener();
     private MyLocationConfiguration.LocationMode mCurrentMode;
-    private List<BookInfo> allBooks;
+    private List<BookInfoList> allBooks=new ArrayList<>();
     private MapView mMapView;
     private BaiduMap mBaiduMap;
     private OverlayOptions overlayOptions;
@@ -71,7 +79,7 @@ public class MarketFragment extends Fragment {
     private LatLng curPos;
     private InfoWindow mInfoWindow;
 
-    private BookInfo seleted;
+    private BookInfoList seleted;
     private static final int DETAILREQUEST = 1;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -87,7 +95,34 @@ public class MarketFragment extends Fragment {
                 parent.removeView(mRootView);
             }
         }
-        allBooks = MyDataBaseHelper.getInstance(getActivity()).getAllBooks();
+        //allBooks = MyDataBaseHelper.getInstance(getActivity()).getAllBooks();
+        BmobQuery<BookInfo> query= new BmobQuery<BookInfo>();
+        query.findObjects(new FindListener<BookInfo>() {
+            @Override
+            public void done(List<BookInfo> list, BmobException e) {
+                if(e==null){
+                    for(int i=0;i<list.size();i++){
+                        BookInfo book = list.get(i);
+                        BookInfoList booklist= new BookInfoList();
+                        booklist.setTitle(book.getTitle());
+                        booklist.setTime(book.getCreateDate());
+                        booklist.setLocation(book.getLocation());
+                        booklist.setPublishType(book.getPublishType());
+                        booklist.setImg(new BitmapToBase64().base64ToBitmap(book.getImg()));
+                        booklist.setObjectId(book.getObjectId());
+                        booklist.setLatitude(book.getLatitude());
+                        booklist.setLongitude(book.getLongitude());
+                        booklist.setDes(book.getDes());
+                        allBooks.add(booklist);
+
+                    }
+
+
+                }else{
+                    Log.i("bmob","失败:"+e.getMessage()+","+e.getErrorCode());
+                }
+            }
+        });
         mCurrentMode = MyLocationConfiguration.LocationMode.NORMAL;
 
         // 地图初始化
@@ -140,7 +175,7 @@ public class MarketFragment extends Fragment {
         mBaiduMap.setOnMarkerClickListener(new BaiduMap.OnMarkerClickListener() {
             @Override
             public boolean onMarkerClick(final Marker marker) {
-                BookInfo book = (BookInfo) marker.getExtraInfo().get("book");
+                BookInfoList book = (BookInfoList) marker.getExtraInfo().get("book");
 
                 View view = LayoutInflater.from(getActivity().getApplicationContext()).inflate(R.layout.book_info_window,null);
 
@@ -192,7 +227,7 @@ public class MarketFragment extends Fragment {
                     public void onInfoWindowClick() {
                     Intent intent = new Intent();
                     intent.setClass(getActivity(),BookDetailActivity.class);
-                    intent.putExtra("title",seleted.getTitle());
+                    intent.putExtra("objectId",seleted.getObjectId());
                     startActivityForResult(intent,DETAILREQUEST);
                     mBaiduMap.hideInfoWindow();
                     }
@@ -243,7 +278,7 @@ public class MarketFragment extends Fragment {
         mCurrentMarker = BitmapDescriptorFactory
                 .fromResource(R.mipmap.book_maker);
 
-        for (BookInfo book:allBooks) {
+        for (BookInfoList book:allBooks) {
 
             LatLng l = new LatLng(book.getLatitude(),book.getLongitude());
             if(mBaiduMap.getMapStatus().bound.contains(l)) {
