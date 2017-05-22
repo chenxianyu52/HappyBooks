@@ -121,6 +121,7 @@ public class HomeFragment extends android.support.v4.app.Fragment {
 //        bookListAdapter = new BookListAdapter(getActivity(), allBooks);
 //        listView.setAdapter(bookListAdapter);
         BmobQuery<BookInfo> query= new BmobQuery<BookInfo>();
+        query.order("-createDate");
         query.findObjects(new FindListener<BookInfo>() {
             @Override
             public void done(List<BookInfo> list, BmobException e) {
